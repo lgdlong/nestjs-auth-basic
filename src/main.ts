@@ -7,12 +7,10 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import ms from 'ms';
-import passport from "passport"
+import passport from 'passport';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-  );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT');
@@ -26,19 +24,23 @@ async function bootstrap() {
   app.use(cookieParser());
 
   //config session
-  app.use(session({
-    secret: configService.get<string>('EXPRESS_SESSION_SECRET'),
-    resave: true,
-    saveUninitialized: false,
-    cookie: { maxAge: ms(configService.get<string>('EXPRESS_SESSION_COOKIE')) },
-    store: MongoStore.create({
-      mongoUrl: configService.get<string>('MONGODB_URI'),
-    })
-  }));
+  app.use(
+    session({
+      secret: configService.get<string>('EXPRESS_SESSION_SECRET'),
+      resave: true,
+      saveUninitialized: false,
+      cookie: {
+        maxAge: ms(configService.get<string>('EXPRESS_SESSION_COOKIE')),
+      },
+      store: MongoStore.create({
+        mongoUrl: configService.get<string>('MONGODB_URI'),
+      }),
+    }),
+  );
 
   //config passport
-  app.use(passport.initialize())
-  app.use(passport.session())
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   await app.listen(port);
 }
